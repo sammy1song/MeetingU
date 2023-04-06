@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User
 from datetime import datetime
 
+
 # Create your models here.
 class User(AbstractUser):
     is_email_verified = models.BooleanField(default=False)
@@ -74,15 +75,12 @@ class Universities(models.Model):
 
 
 class TimeSlot(models.Model):
-    giver = models.ForeignKey(User, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    
-    def __str__(self) -> str:
-        return f"{self.giver.username} - {self.start_time.strftime('%Y-%m-%d %H:%M')} to {self.end_time.strftime('%Y-%m-%d %H:%M')}"
+    is_reserved = models.BooleanField(default=False)
+    User = models.ForeignKey('myapp.User', null=True, blank=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return f"{self.start_time} - {self.end_time}"
 
 
-class Reservation(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    timeslot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)

@@ -13,60 +13,12 @@
 }
 
 .hidden,
-
-/* Mentors section styles */
-
-.mentors {
-    background-color: #f7f7f7;
-    text-align: center;
-    padding: 4rem 1rem;
-  }
-  
-  .mentors-title {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-  }
-  
-  .mentors-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
-  }
-  
-  .mentor {
-    background-color: #fff;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: left;
-  }
-  
-  .mentor-img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .mentor-name {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-  }
-  
-  .mentor-description {
-    font-size: 1rem;
-    line-height: 1.5rem;
-  }
-  
 .hidden * {
     pointer-events: none;
     visibility: hidden;
 }
 
 .frame-1-1 {
-    color: aqua;
     align-items: center;
     display: flex;
     gap: 1013px;
@@ -180,16 +132,11 @@
     width: 828px;
 }
 
-.circle-image {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    overflow: hidden;
-}
-
-.circle-image img {
-
-    width:100%;
+.ellipse {
+    background-color: var(--alto);
+    border-radius: 200px;
+    height: 400px;
+    min-width: 400px;
 }
 
 .frame-16 {
@@ -220,7 +167,7 @@
 .frame-13 {
     align-items: center;
     display: flex;
-    gap: 29px;
+    gap: 49px;
     width: fit-content;
     padding: 30px 30px
 }
@@ -440,7 +387,7 @@
 .frame-21 {
     align-items: center;
     display: flex;
-    gap: 400px;
+    gap: 507px;
     width: fit-content;
 }
 
@@ -509,4 +456,3 @@
 .input_box:hover {
     background-color: var(--alto);
 }
-

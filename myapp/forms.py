@@ -6,7 +6,3 @@ class GiverForm(forms.ModelForm):
         model = Giver
         fields = ['firstname', 'profile_image']
 
-class ReservationForm(forms.ModelForm):
-    class Meta:
-        model = Reservation
-        fields = ['timeslot']

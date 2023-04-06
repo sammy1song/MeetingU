@@ -79,13 +79,6 @@
     position: relative;
 }
 
-.frame-get {
-    height: 30px;
-    min-width: 400px;
-    position: relative;
-}
-
-
 .already-have-an-account {
     color: var(--black);
     font-family: var(--font-family-open_sans);
@@ -99,38 +92,7 @@
     top: -1px;
 }
 
-.forget-your-password {
-    color: var(--black);
-    font-family: var(--font-family-open_sans);
-    font-size: var(--font-size-l2);
-    font-weight: 600;
-    left: 0;
-    letter-spacing: 0.51px;
-    line-height: normal;
-    position: absolute;
-    text-align: center;
-    top: -1px;
-}
-
 .login-now {
-    color: #1511e7;
-    cursor: pointer;
-    font-family: var(--font-family-open_sans);
-    font-size: var(--font-size-l2);
-    font-weight: 600;
-    left: 236px;
-    letter-spacing: 0.51px;
-    line-height: normal;
-    position: absolute;
-    text-align: center;
-    text-decoration: underline;
-    top: -1px;
-    background-color: transparent;
-    border: none;
-    overflow: hidden;
-}
-
-.forget-now {
     color: #1511e7;
     cursor: pointer;
     font-family: var(--font-family-open_sans);

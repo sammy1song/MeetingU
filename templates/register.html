@@ -20,7 +20,7 @@
             <div class="frame-3">
                 <div class="flex-col">
                     <p class="looking-for-mentor opensans-extra-bold-black-20px">
-                        Look for a Mentor at MeetingU!
+                        Are you a student looking for a mentor?
                     </p>
                     <img class="line" src="{% static 'line.png' %}" alt="Line 3" />
                     <input type="submit" class="frame-31 opensans-semi-bold-white-22px" value="Register as Student" onclick="location.href='{% url 'register_student' %}'"/>
@@ -29,7 +29,7 @@
             <div class="frame-3">
                 <div class="flex-col">
                     <p class="become-a-mentor opensans-extra-bold-black-20px">
-                        Be a Mentor for MeetingU!
+                        Are you trying to become a mentor?
                     </p>
                     <img class="line" src="{% static 'line.png' %}" alt="Line 4" />
                     <input type="submit" class="frame-31 opensans-semi-bold-white-22px" value="Register as Mentor" onclick="location.href='{% url 'register_teacher' %}'"/>
@@ -40,12 +40,6 @@
                     Already have an Account?
                 </div>
                 <input type="submit" class="login-now" value="Login Now" onclick="location.href='{% url 'login' %}'"/>
-            </div>
-            <div class="frame-35">
-               <div class="already-have-an-account">
-                    Forgot your password?
-               </div>
-               <input type="submit" class="login-now" value="Reset your password" onclick="location.href='{% url 'reset_password' %}'"/>     
             </div>
         </div>
     </div>

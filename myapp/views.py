@@ -13,15 +13,18 @@ from django.utils.html import strip_tags
 from django.urls import reverse
 from .utils import generate_email_token, generate_confirmation_token
 from django.core.mail import EmailMessage
+from django.core.mail import send_mail
 from django.conf import settings
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 from .forms import *
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
-from .models import TimeSlot, Reservation
-from .forms import ReservationForm
+from .models import TimeSlot
+import jwt
+import requests
+
 
 
 
@@ -263,7 +266,8 @@ def profile(request, pk):
     givers = Giver.objects.all()
     universities = Universities.objects.all()
     meetings = Meeting.objects.filter(giver=profile.username)
-    return render(request, 'profile2.html', {'profile': profile, 'givers':givers, 'universities':universities, 'meetings':meetings})
+    available_timeslots = TimeSlot.objects.filter(user = profile.user, is_reserved = False)
+    return render(request, 'profile2.html', {'profile': profile, 'givers':givers, 'universities':universities, 'meetings':meetings, 'available_timeslots': available_timeslots,})
 
 
 #GO TO CONFIRM RESERVATION PAGE
@@ -550,19 +554,80 @@ def check_Giver_availability(giver, dt, tm):  # check if engineer is available i
 
     return True
 
-def reserve_timeslot(request, profile_id):
-    if request.method == 'POST':
-        form = ReservationForm(request.POST)
-        if form.is_valid():
-            reservation = form.save(commit=False)
-            reservation.user = request.user
-            reservation.save()
-            return redirect('confirm_reservation', profile_id=profile_id)
-    else:
-        form = ReservationForm()
-
-    timeslots = Timeslot.objects.all()
-    return render(request, 'reserve_timeslot.html', {'timeslots': timeslots, 'form': form})
-
 def confirm_reservation(request, profile_id):
     return render(request, 'confirm_reservation.html')
+
+
+def reserve_timeslot(request):
+    if request.method == 'POST':
+        timeslot_id = request.POST.get('timeslot')
+        timeslot = TimeSlot.objects.get(id=timeslot_id)
+
+        # Check if the timeslot is still available
+        if timeslot.is_reserved:
+            messages.error(request, 'The selected timeslot is no longer available. Please choose another one.')
+            return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
+        # Reserve the timeslot
+        timeslot.is_reserved = True
+        timeslot.save()
+
+        # Create a Zoom meeting and get the join URL
+        zoom_meeting_link = create_zoom_meeting(timeslot)
+
+        # Send the confirmation email with the Zoom link
+        send_confirmation_email(request.user.email, timeslot, zoom_meeting_link)
+
+        messages.success(request, 'Timeslot reserved successfully. A confirmation email has been sent.')
+        return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
+    return redirect('home')
+
+def create_zoom_meeting(timeslot):
+    # Replace with your Zoom API credentials
+    zoom_api_key = settings.ZOOM_API_KEY
+    zoom_api_secret = settings.ZOOM_API_SECRET
+    zoom_user_id = settings.ZOOM_USER_ID
+
+    # Generate JWT token for authorization
+    payload = {
+        'iss': zoom_api_key,
+        'exp': datetime.utcnow() + timedelta(hours=1)
+    }
+    jwt_token = jwt.encode(payload, zoom_api_secret, algorithm='HS256')
+
+    # Set up Zoom API headers and endpoint
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {jwt_token}'
+    }
+    url = f'https://api.zoom.us/v2/users/{zoom_user_id}/meetings'
+
+    # Set up Zoom meeting data
+    meeting_data = {
+        'topic': 'Mentor Meeting',
+        'start_time': timeslot.start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'duration': 60,  # Duration in minutes
+        'timezone': 'UTC'
+    }
+
+    # Create the Zoom meeting
+    response = requests.post(url, headers=headers, json=meeting_data)
+
+    if response.status_code == 201:
+        meeting_info = response.json()
+        return meeting_info["join_url"]
+    else:
+        raise ValueError("Failed to create Zoom meeting.")
+
+def send_confirmation_email(receiver_email, timeslot, zoom_meeting_link):
+    subject = "Timeslot Reservation Confirmation"
+    message = f"Dear {receiver_email},\n\nYour timeslot reservation has been confirmed for {timeslot.start_time.strftime('%Y-%m-%dT%H:%M:%SZ')} - {timeslot.end_time.strftime('%Y-%m-%dT%H:%M:%SZ')}. Please join the meeting using the following Zoom link:\n\n{zoom_meeting_link}\n\nBest regards,\nThe MeetingU Team"
+    from_email = settings.EMAIL_HOST_USER
+    recipient_list = [receiver_email]
+
+    send_mail(subject, message, from_email, recipient_list)
+
+
+
+

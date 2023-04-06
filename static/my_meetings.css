@@ -603,21 +603,3 @@
     gap: 23px;
     width: fit-content;
 }
-
-.buttongroup{
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-.button{
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 5px;
-    text-align: center;
-    margin: 10px;
-    cursor: pointer;
-}

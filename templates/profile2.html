@@ -83,16 +83,19 @@ e<!DOCTYPE html>
                     <div class="available-times opensans-bold-black-25px">Reserve a Time Slot</div>
                 </div>
                 <div class="frame-157">
-                    <form action="{% url 'reserve_timeslot' profile.id %}" method="post">
+                    <form method="post" action="{% url 'reserve_timeslot' %}">
                         {% csrf_token %}
-                        {% for timeslot in timeslots %}
-                          <div>
-                            <input type="radio" id="timeslot_{{ timeslot.id }}" name="timeslot_id" value="{{ timeslot.id }}" required>
-                            <label for="timeslot_{{ timeslot.id }}">{{ timeslot.start_time|date:'F d, Y' }} from {{ timeslot.start_time|time:'g:i A' }} to {{ timeslot.end_time|time:'g:i A' }}</label>
-                          </div>
-                        {% endfor %}
-                        <input type="submit" value = "Go Reserve" />
-                      </form>
+                        <select name="timeslot" required>
+                            <option value="" selected disabled>Select a Time Slot</option>
+                            {% for TimeSlot in available_timeslots %}
+                                <option value="{{ TimeSlot.id }}">
+                                    {{ TimeSlot.start_time|date:"D, d M Y H:i" }} - {{ TimeSlot.end_time|date:"D, d M Y H:i" }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="mentor" value="{{ profile.user.id }}" />
+                        <input type="submit" value="Reserve" />
+                    </form>
                 </div>
             </div>
             <div class="frame-159">

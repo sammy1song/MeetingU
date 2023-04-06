@@ -18,6 +18,7 @@ urlpatterns = [
     path('reset_password_complete', auth_views.PasswordResetCompleteView.as_view(template_name="password_reset_done.html"), name="password_reset_complete"),
 
     path('search', views.search, name='search'),
+    path('reserve_timeslot/', views.reserve_timeslot, name='reserve_timeslot'),
     path('profile/<str:pk>', views.profile, name='profile'),
     path('profile/<str:pk>/confirm_reservation', views.confirm_reservation, name='confirm_reservation'),
     path('profile/<str:pk>/confirm_reservation/confirmed', views.confirmed, name='confirmed'),
@@ -37,6 +38,4 @@ urlpatterns = [
     path('my_profile/<str:pk>/my_meetings/reject_reservation/<str:pk2>', views.reject_reservation, name='reject_reservation'),
     path('my_profile/<str:pk>/my_meetings/reject_reservation/<str:pk2>/rejected', views.reject_for_sure, name='reject_for_sure'),
     path('my_profile/<str:pk>/my_meetings/upload_video/<str:pk2>', views.upload_video, name='upload_video'),
-    path('reserve_timeslot/<int:profile_id>/', views.reserve_timeslot, name='reserve_timeslot'),
-    path('confirm_reservation/<int:profile_id>/', views.confirm_reservation, name='confirm_reservation'),
 ]
