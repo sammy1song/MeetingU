@@ -19,11 +19,11 @@ import threading
 from datetime import datetime, timedelta
 from .forms import *
 from django.core.files.storage import FileSystemStorage
-from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from .models import TimeSlot
 import jwt
 import requests
+import pytz
 
 
 
@@ -329,6 +329,7 @@ def confirm_meeting(request, uidb64, token):
         meeting.save()
         messages.add_message(request, messages.SUCCESS,'Meeting is confirmed')
         return render(request, 'confirm_success.html')
+
     return render(request, 'activate-failed.html', {"meeting": meeting})
 
 
@@ -533,27 +534,6 @@ def cancel_for_sure(request, pk, pk2):
     return redirect(reverse('login'))
 
 
-def check_Giver_availability(giver, dt, tm):  # check if engineer is available in a given slot
-    tm = tm[:-3]  # separate AM/PM
-    hr = tm[:-3]  # get hour reading
-    mn = tm[-2:]  # get minute reading
-    ftm = time(int(hr), int(mn), 0)  # create a time object
-    app = Appointment.objects.all().filter(status=True,
-                                           giver=Giver,
-                                           app_date=dt)  # get all appointments for a given eng and the given date
-
-    if ftm < time(9, 0, 0) or ftm > time(17, 0, 0):  # if time is not in between 9AM to 5PM, reject
-        return False
-
-    if time(12, 0, 0) < ftm < time(13, 0, 0):  # if time is in between 12PM to 1PM, reject
-        return False
-
-    for a in app:
-        if ftm == a.app_time and dt == a.app_date:  # if some other appointment has the same slot, reject
-            return False
-
-    return True
-
 def confirm_reservation(request, profile_id):
     return render(request, 'confirm_reservation.html')
 
@@ -603,10 +583,12 @@ def create_zoom_meeting(timeslot):
     }
     url = f'https://api.zoom.us/v2/users/{zoom_user_id}/meetings'
 
+
     # Set up Zoom meeting data
+    utc_start_time = timeslot.start_time.astimezone(pytz.utc)
     meeting_data = {
         'topic': 'Mentor Meeting',
-        'start_time': timeslot.start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'start_time': utc_start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
         'duration': 60,  # Duration in minutes
         'timezone': 'UTC'
     }
@@ -620,11 +602,14 @@ def create_zoom_meeting(timeslot):
     else:
         raise ValueError("Failed to create Zoom meeting.")
 
+
+
 def send_confirmation_email(receiver_email, timeslot, zoom_meeting_link):
+    giver_email = timeslot.giver.email
     subject = "Timeslot Reservation Confirmation"
-    message = f"Dear {receiver_email},\n\nYour timeslot reservation has been confirmed for {timeslot.start_time.strftime('%Y-%m-%dT%H:%M:%SZ')} - {timeslot.end_time.strftime('%Y-%m-%dT%H:%M:%SZ')}. Please join the meeting using the following Zoom link:\n\n{zoom_meeting_link}\n\nBest regards,\nThe MeetingU Team"
+    message = f"Dear {receiver_email} and {giver_email},\n\nYour timeslot reservation has been confirmed for {timeslot.start_time.strftime('%Y-%m-%dT%H:%M:%SZ')} - {timeslot.end_time.strftime('%Y-%m-%dT%H:%M:%SZ')}. Please join the meeting using the following Zoom link:\n\n{zoom_meeting_link}\n\nBest regards,\nThe MeetingU Team"
     from_email = settings.EMAIL_HOST_USER
-    recipient_list = [receiver_email]
+    recipient_list = [receiver_email, giver_email]
 
     send_mail(subject, message, from_email, recipient_list)
 

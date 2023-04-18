@@ -1,4 +1,4 @@
-e<!DOCTYPE html>
+<!DOCTYPE html>
 {% load static %}
 <html lang="en">
 
@@ -87,10 +87,10 @@ e<!DOCTYPE html>
                         {% csrf_token %}
                         <select name="timeslot" required>
                             <option value="" selected disabled>Select a Time Slot</option>
-                            {% for TimeSlot in available_timeslots %}
-                                <option value="{{ TimeSlot.id }}">
-                                    {{ TimeSlot.start_time|date:"D, d M Y H:i" }} - {{ TimeSlot.end_time|date:"D, d M Y H:i" }}
-                                </option>
+                            {% for time_slot in available_timeslots %}
+                                    <option value="{{ time_slot.id }}">
+                                    {{ time_slot.start_time|date:"D, d M Y H:i" }} - {{ time_slot.end_time|date:"D, d M Y H:i" }}
+                                    </option>
                             {% endfor %}
                         </select>
                         <input type="hidden" name="mentor" value="{{ profile.user.id }}" />

@@ -126,3 +126,7 @@ EMAIL_HOST_USER = 'uteventreminder@gmail.com'
 EMAIL_HOST_PASSWORD = 'dazgyqctoijjdhnm'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
+
+ZOOM_API_KEY = ''
+ZOOM_API_SECRET = ''
+ZOOM_USER_ID = ''
